@@ -1,11 +1,11 @@
-// src/App.jsx
+import {BrowserRouter, Routes, Route, NavLink, useNavigate} from 'react-router-dom';
 
-import {BrowserRouter, Routes, Route, NavLink} from 'react-router-dom';
-
-// Import all the major page/feature components we have built
-import NextTodo from './components/NextTodo.jsx';
+// Import Context Providers and hooks
+import {AuthProvider} from "./context/AuthProvider.jsx";
+import { useAuth } from './context/AuthContext.jsx';
+import NextTodo from './components/NextTodo.jsx'; // Ensure path is correct
 import StockWatchlistPage from './pages/StockWatchlistPage';
-import UserDashboardPage from './features/user-dashboard/UserDashboardPage.jsx';
+import UserDashboardPage from './features/user-dashboard/UserDashboardPage';
 
 // A simple component for the home page
 const HomePage = () => (
@@ -18,23 +18,39 @@ const HomePage = () => (
     </div>
 );
 
+// Main App component now sets up the providers
 function App() {
-    // This function determines the style for our navigation links
-    const getNavLinkClass = ({isActive}) => {
+    return (
+            <AuthProvider>
+                <BrowserRouter>
+                    <AppLayout />
+                </BrowserRouter>
+            </AuthProvider>
+    );
+}
+
+// The Layout component consumes the context and contains the UI structure
+function AppLayout() {
+    const { user, loading, login, logout } = useAuth(); // Consume the auth context
+
+    const navigate = useNavigate();
+
+    const getNavLinkClass = ({ isActive }) => {
         const baseClasses = "block w-full text-left px-4 py-2 rounded-md transition-colors duration-200";
-        if (isActive) {
-            return `${baseClasses} bg-cyan-500 text-white font-semibold`;
-        }
-        return `${baseClasses} text-gray-300 hover:bg-gray-700 hover:text-white`;
+        return isActive
+            ? `${baseClasses} bg-cyan-500 text-white font-semibold`
+            : `${baseClasses} text-gray-300 hover:bg-gray-700 hover:text-white`;
+    };
+
+    const handleLogout = () => {
+        logout(() => navigate('/'));
     };
 
     return (
-        // BrowserRouter is the top-level component that enables routing
-        <BrowserRouter>
-            <div
-                className="h-[97vh] flex font-sans bg-gray-900 text-white">
-                {/* --- Sidebar Navigation --- */}
-                <nav className="w-64 bg-gray-800 p-4 shrink-0">
+        <div className="h-[96vh] flex font-sans bg-gray-900 text-white overflow-hidden">
+            {/* --- Sidebar Navigation --- */}
+            <nav className="w-64 bg-gray-800 p-4 shrink-0 flex flex-col">
+                <div>
                     <h2 className="text-xl font-bold text-white mb-6">Examples Menu</h2>
                     <ul className="space-y-2">
                         <li><NavLink to="/" className={getNavLinkClass}>Home</NavLink></li>
@@ -42,20 +58,41 @@ function App() {
                         <li><NavLink to="/stock-watchlist" className={getNavLinkClass}>2. Stock Watchlist</NavLink></li>
                         <li><NavLink to="/user-dashboard" className={getNavLinkClass}>3. User Dashboard</NavLink></li>
                     </ul>
-                </nav>
+                </div>
 
-                {/* --- Main Content Area --- */}
-                <main className="flex-grow p-8">
-                    {/* The Routes component renders the matching Route's element */}
-                    <Routes>
-                        <Route path="/" element={<HomePage/>}/>
-                        <Route path="/todo" element={<NextTodo/>}/>
-                        <Route path="/stock-watchlist" element={<StockWatchlistPage/>}/>
-                        <Route path="/user-dashboard" element={<UserDashboardPage/>}/>
-                    </Routes>
-                </main>
-            </div>
-        </BrowserRouter>
+                {/* --- Auth Status UI in Sidebar --- */}
+                <div className="mt-auto border-t border-gray-700 pt-4">
+                    {loading ? (
+                        <p className="text-gray-400 text-center">Authenticating...</p>
+                    ) : user ? (
+                        <div>
+                            <p className="text-sm text-gray-300">Welcome,</p>
+                            <p className="font-bold text-white truncate">{user.name}</p>
+                            <button onClick={handleLogout} className="w-full mt-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-lg transition-colors">
+                                Logout
+                            </button>
+                        </div>
+                    ) : (
+                        <div>
+                            <p className="text-sm text-center text-gray-300">You are not logged in.</p>
+                            <button onClick={() => login('Alice')} className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg transition-colors">
+                                Login as Alice
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </nav>
+
+            {/* --- Main Content Area --- */}
+            <main className="flex-grow p-8 overflow-y-auto">
+                <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/todo" element={<NextTodo />} />
+                    <Route path="/stock-watchlist" element={<StockWatchlistPage />} />
+                    <Route path="/user-dashboard" element={<UserDashboardPage />} />
+                </Routes>
+            </main>
+        </div>
     );
 }
 

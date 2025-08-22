@@ -1,18 +1,17 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useUsers } from './hooks/useUsers.js';
+import { useUsers } from './hooks/useUsers';
+import { useAuth } from '../../context/AuthContext.jsx'; // 1. Import the auth hook
 import SearchBar from './components/SearchBar.jsx';
 import UserItem from './components/UserItem.jsx';
 
 function UserDashboardPage() {
     console.log('%c[UserDashboardPage] Re-rendering...', 'color: blue; font-weight: bold;');
 
-    // State and logic from our custom hook
+    // 2. Consume the authentication context
+    const { user, loading: authLoading } = useAuth();
     const { users, removeUser, promoteUser } = useUsers();
-
-    // State that is local to THIS component. Changing it will cause this page to re-render.
     const [searchTerm, setSearchTerm] = useState('');
 
-    // useMemo to filter users. This calculation only re-runs if `users` or `searchTerm` change.
     const filteredUsers = useMemo(() => {
         console.log('%c[UserDashboardPage] Filtering users (useMemo)...', 'color: purple;');
         return users.filter(user =>
@@ -20,8 +19,8 @@ function UserDashboardPage() {
         );
     }, [users, searchTerm]);
 
-    // useCallback ensures that the functions passed to SearchBar and UserItem
-    // do not get re-created on every render, which is critical for React.memo to work.
+    // These useCallback hooks will now work correctly because removeUser and
+    // promoteUser (from the updated useUsers hook) are stable.
     const handleRemoveUser = useCallback((userId) => {
         removeUser(userId);
     }, [removeUser]);
@@ -34,22 +33,46 @@ function UserDashboardPage() {
         setSearchTerm(e.target.value);
     }, []);
 
+    // 3. Add loading and protected route logic
+    if (authLoading) {
+        return <h2 className="text-2xl text-center">Verifying access...</h2>;
+    }
+
+    if (!user) {
+        return (
+            <div className="text-center bg-gray-800 p-8 rounded-lg">
+                <h2 className="text-2xl text-red-400">Access Denied</h2>
+                <p className="mt-2">You must be logged in to view the User Dashboard.</p>
+            </div>
+        );
+    }
+
+    // 4. Cleaned-up JSX with a personalized welcome and empty state
     return (
-        <div className="bg-gray-900 text-white flex justify-center p-4 font-sans">
-            <div className="w-full max-w-2xl bg-gray-800 p-8 rounded-lg shadow-lg">
-                <h1 className="text-3xl font-bold mb-6 text-cyan-400">User Dashboard</h1>
+        <div className="w-full max-w-2xl mx-auto">
+            <div className="bg-gray-800 p-8 rounded-lg shadow-lg">
+                <div className="mb-6">
+                    <h1 className="text-3xl font-bold text-cyan-400">User Dashboard</h1>
+                    <p className="text-gray-400">Welcome back, {user.name}!</p>
+                </div>
 
                 <SearchBar searchTerm={searchTerm} onSearchChange={handleSearch} />
 
                 <div className="space-y-4">
-                    {filteredUsers.map(user => (
-                        <UserItem
-                            key={user.id}
-                            user={user}
-                            onRemove={handleRemoveUser}
-                            onPromote={handlePromoteUser}
-                        />
-                    ))}
+                    {filteredUsers.length > 0 ? (
+                        filteredUsers.map(u => (
+                            <UserItem
+                                key={u.id}
+                                user={u}
+                                onRemove={handleRemoveUser}
+                                onPromote={handlePromoteUser}
+                            />
+                        ))
+                    ) : (
+                        <p className="text-center text-gray-500 py-4">
+                            No users found matching your search.
+                        </p>
+                    )}
                 </div>
             </div>
         </div>
