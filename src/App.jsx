@@ -7,10 +7,14 @@ import NextTodo from './components/NextTodo.jsx'; // Ensure path is correct
 import UserDashboardPage from './features/user-dashboard/UserDashboardPage';
 import {lazy, Suspense} from "react";
 import RiskyPage from "./pages/RiskyPage.jsx";
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
+const ComplexQueryPage = lazy(() => import('./features/blog/ComplexQueryPage'));
 const StockWatchlistPage = lazy(() => import('./pages/StockWatchlistPage'));
 
-// A simple component for the home page
+
+const queryClient = new QueryClient();
+
 const HomePage = () => (
     <div>
         <h1 className="text-4xl font-bold text-cyan-400 mb-4">React Learning Hub</h1>
@@ -24,11 +28,13 @@ const HomePage = () => (
 // Main App component now sets up the providers
 function App() {
     return (
-        <AuthProvider>
-            <BrowserRouter>
-                <AppLayout/>
-            </BrowserRouter>
-        </AuthProvider>
+        <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+                <BrowserRouter>
+                    <AppLayout/>
+                </BrowserRouter>
+            </AuthProvider>
+        </QueryClientProvider>
     );
 }
 
@@ -56,7 +62,7 @@ function AppLayout() {
     );
 
     return (
-        <div className="h-[96vh] flex font-sans bg-gray-900 text-white overflow-hidden">
+        <div className="h-[95vh] flex font-sans bg-gray-900 text-white overflow-hidden">
             {/* --- Sidebar Navigation --- */}
             <nav className="w-64 bg-gray-800 p-4 shrink-0 flex flex-col">
                 <div>
@@ -67,6 +73,7 @@ function AppLayout() {
                         <li><NavLink to="/stock-watchlist" className={getNavLinkClass}>2. Stock Watchlist</NavLink></li>
                         <li><NavLink to="/user-dashboard" className={getNavLinkClass}>3. User Dashboard</NavLink></li>
                         <li><NavLink to="/risky-page" className={getNavLinkClass}>4. Error Boundary</NavLink></li>
+                        <li><NavLink to="/blog" className={getNavLinkClass}>5. Blog</NavLink></li>
                     </ul>
                 </div>
 
@@ -103,7 +110,8 @@ function AppLayout() {
                         <Route path="/todo" element={<NextTodo/>}/>
                         <Route path="/stock-watchlist" element={<StockWatchlistPage/>}/>
                         <Route path="/user-dashboard" element={<UserDashboardPage/>}/>
-                        <Route path="/risky-page" element={<RiskyPage />} />
+                        <Route path="/risky-page" element={<RiskyPage/>}/>
+                        <Route path="/blog" element={<ComplexQueryPage/>}/>
                     </Routes>
                 </Suspense>
             </main>
