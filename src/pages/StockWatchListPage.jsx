@@ -27,7 +27,7 @@ function StockWatchlistPage() {
     }, [stockData, watchlist]);
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white flex justify-center p-4 font-sans">
+        <div className="bg-gray-900 text-white flex justify-center p-4 font-sans">
             <div className="w-full max-w-2xl">
                 <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
 

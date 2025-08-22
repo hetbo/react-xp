@@ -50,7 +50,7 @@ function NextTodo() {
     });
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center font-sans">
+        <div className="bg-gray-900 text-white flex items-center justify-center font-sans">
             <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
                 <h1 className="text-3xl font-bold mb-6 text-center text-cyan-400">TodoNext</h1>
 

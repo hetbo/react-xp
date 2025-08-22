@@ -1,20 +1,10 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.jsx'
-import SimpleTodo from "./components/SimpleTodo.jsx";
-import NextTodo from "./components/NextTodo.jsx";
-import StockWatchlistPage from "./pages/StockWatchListPage.jsx";
+import App from "./App.jsx";
 
 createRoot(document.getElementById('root')).render(
-      <div className="h-screen text-white p-4 w-screen bg-neutral-900">
-{/*
-          <SimpleTodo />
-          <NextTodo />
-*/}
-
-            <StockWatchlistPage />
-
+      <div className="min-h-screen text-white p-4 bg-neutral-900">
+            <App />
       </div>
 ,
 )
