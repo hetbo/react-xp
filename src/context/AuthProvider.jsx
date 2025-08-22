@@ -36,12 +36,9 @@ export function AuthProvider({ children }) {
     };
 
     const logout = (callback) => {
-        console.log('%c[AuthContext] Logging out...', 'color: orange;');
 
         setUser(null);
         Cookies.remove('user', { path: '/' });
-
-        console.log('%c[AuthContext] Logged out and cookie removed.', 'color: green;');
 
         // If a callback function was provided, call it.
         if (callback) {

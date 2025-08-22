@@ -2,10 +2,13 @@ import {BrowserRouter, Routes, Route, NavLink, useNavigate} from 'react-router-d
 
 // Import Context Providers and hooks
 import {AuthProvider} from "./context/AuthProvider.jsx";
-import { useAuth } from './context/AuthContext.jsx';
+import {useAuth} from './context/AuthContext.jsx';
 import NextTodo from './components/NextTodo.jsx'; // Ensure path is correct
-import StockWatchlistPage from './pages/StockWatchlistPage';
 import UserDashboardPage from './features/user-dashboard/UserDashboardPage';
+import {lazy, Suspense} from "react";
+import RiskyPage from "./pages/RiskyPage.jsx";
+
+const StockWatchlistPage = lazy(() => import('./pages/StockWatchlistPage'));
 
 // A simple component for the home page
 const HomePage = () => (
@@ -21,21 +24,21 @@ const HomePage = () => (
 // Main App component now sets up the providers
 function App() {
     return (
-            <AuthProvider>
-                <BrowserRouter>
-                    <AppLayout />
-                </BrowserRouter>
-            </AuthProvider>
+        <AuthProvider>
+            <BrowserRouter>
+                <AppLayout/>
+            </BrowserRouter>
+        </AuthProvider>
     );
 }
 
 // The Layout component consumes the context and contains the UI structure
 function AppLayout() {
-    const { user, loading, login, logout } = useAuth(); // Consume the auth context
+    const {user, loading, login, logout} = useAuth(); // Consume the auth context
 
     const navigate = useNavigate();
 
-    const getNavLinkClass = ({ isActive }) => {
+    const getNavLinkClass = ({isActive}) => {
         const baseClasses = "block w-full text-left px-4 py-2 rounded-md transition-colors duration-200";
         return isActive
             ? `${baseClasses} bg-cyan-500 text-white font-semibold`
@@ -45,6 +48,12 @@ function AppLayout() {
     const handleLogout = () => {
         logout(() => navigate('/'));
     };
+
+    const LoadingFallback = () => (
+        <div className="flex justify-center items-center h-full">
+            <p className="text-xl text-gray-400">Loading Page...</p>
+        </div>
+    );
 
     return (
         <div className="h-[96vh] flex font-sans bg-gray-900 text-white overflow-hidden">
@@ -57,6 +66,7 @@ function AppLayout() {
                         <li><NavLink to="/todo" className={getNavLinkClass}>1. To-Do List</NavLink></li>
                         <li><NavLink to="/stock-watchlist" className={getNavLinkClass}>2. Stock Watchlist</NavLink></li>
                         <li><NavLink to="/user-dashboard" className={getNavLinkClass}>3. User Dashboard</NavLink></li>
+                        <li><NavLink to="/risky-page" className={getNavLinkClass}>4. Error Boundary</NavLink></li>
                     </ul>
                 </div>
 
@@ -68,14 +78,16 @@ function AppLayout() {
                         <div>
                             <p className="text-sm text-gray-300">Welcome,</p>
                             <p className="font-bold text-white truncate">{user.name}</p>
-                            <button onClick={handleLogout} className="w-full mt-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-lg transition-colors">
+                            <button onClick={handleLogout}
+                                    className="w-full mt-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-lg transition-colors">
                                 Logout
                             </button>
                         </div>
                     ) : (
                         <div>
                             <p className="text-sm text-center text-gray-300">You are not logged in.</p>
-                            <button onClick={() => login('Alice')} className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg transition-colors">
+                            <button onClick={() => login('Alice')}
+                                    className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-3 rounded-lg transition-colors">
                                 Login as Alice
                             </button>
                         </div>
@@ -85,12 +97,15 @@ function AppLayout() {
 
             {/* --- Main Content Area --- */}
             <main className="flex-grow p-8 overflow-y-auto">
-                <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/todo" element={<NextTodo />} />
-                    <Route path="/stock-watchlist" element={<StockWatchlistPage />} />
-                    <Route path="/user-dashboard" element={<UserDashboardPage />} />
-                </Routes>
+                <Suspense fallback={<LoadingFallback/>}>
+                    <Routes>
+                        <Route path="/" element={<HomePage/>}/>
+                        <Route path="/todo" element={<NextTodo/>}/>
+                        <Route path="/stock-watchlist" element={<StockWatchlistPage/>}/>
+                        <Route path="/user-dashboard" element={<UserDashboardPage/>}/>
+                        <Route path="/risky-page" element={<RiskyPage />} />
+                    </Routes>
+                </Suspense>
             </main>
         </div>
     );

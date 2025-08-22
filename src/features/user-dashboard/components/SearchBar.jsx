@@ -3,7 +3,6 @@ import React from 'react';
 // This component is memoized to prevent re-rendering when the parent re-renders
 // for reasons unrelated to the search term (like the user list changing).
 const SearchBar = React.memo(function SearchBar({ searchTerm, onSearchChange }) {
-    console.log('%c[SearchBar] Re-rendering...', 'color: orange;');
 
     return (
         <input

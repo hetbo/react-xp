@@ -3,17 +3,16 @@ import { useUsers } from './hooks/useUsers';
 import { useAuth } from '../../context/AuthContext.jsx'; // 1. Import the auth hook
 import SearchBar from './components/SearchBar.jsx';
 import UserItem from './components/UserItem.jsx';
+import Modal from "../../components/Modal.jsx";
 
 function UserDashboardPage() {
-    console.log('%c[UserDashboardPage] Re-rendering...', 'color: blue; font-weight: bold;');
 
-    // 2. Consume the authentication context
     const { user, loading: authLoading } = useAuth();
     const { users, removeUser, promoteUser } = useUsers();
     const [searchTerm, setSearchTerm] = useState('');
+    const [userToDelete, setUserToDelete] = useState(null);
 
     const filteredUsers = useMemo(() => {
-        console.log('%c[UserDashboardPage] Filtering users (useMemo)...', 'color: purple;');
         return users.filter(user =>
             user.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
@@ -21,9 +20,9 @@ function UserDashboardPage() {
 
     // These useCallback hooks will now work correctly because removeUser and
     // promoteUser (from the updated useUsers hook) are stable.
-    const handleRemoveUser = useCallback((userId) => {
-        removeUser(userId);
-    }, [removeUser]);
+    const handleRemoveUser = useCallback((user) => {
+        setUserToDelete(user); // Set the user to be deleted, which opens the modal
+    }, []);
 
     const handlePromoteUser = useCallback((userId) => {
         promoteUser(userId);
@@ -32,6 +31,17 @@ function UserDashboardPage() {
     const handleSearch = useCallback((e) => {
         setSearchTerm(e.target.value);
     }, []);
+
+    const cancelDeleteUser = () => {
+        setUserToDelete(null); // Close the modal without deleting
+    };
+
+    const confirmDeleteUser = () => {
+        if (userToDelete) {
+            removeUser(userToDelete.id);
+            setUserToDelete(null); // Close the modal
+        }
+    };
 
     // 3. Add loading and protected route logic
     if (authLoading) {
@@ -61,12 +71,7 @@ function UserDashboardPage() {
                 <div className="space-y-4">
                     {filteredUsers.length > 0 ? (
                         filteredUsers.map(u => (
-                            <UserItem
-                                key={u.id}
-                                user={u}
-                                onRemove={handleRemoveUser}
-                                onPromote={handlePromoteUser}
-                            />
+                            <UserItem key={u.id} user={u} onRemove={() => handleRemoveUser(u)} onPromote={handlePromoteUser} />
                         ))
                     ) : (
                         <p className="text-center text-gray-500 py-4">
@@ -75,6 +80,29 @@ function UserDashboardPage() {
                     )}
                 </div>
             </div>
+            {userToDelete && (
+                <Modal onClose={cancelDeleteUser}>
+                    <h2 className="text-2xl font-bold mb-4">Confirm Deletion</h2>
+                    <p className="text-gray-300 mb-6">
+                        Are you sure you want to delete the user{' '}
+                        <strong className="text-cyan-400">{userToDelete.name}</strong>? This action cannot be undone.
+                    </p>
+                    <div className="flex justify-end gap-4">
+                        <button
+                            onClick={cancelDeleteUser}
+                            className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={confirmDeleteUser}
+                            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
+                        >
+                            Delete User
+                        </button>
+                    </div>
+                </Modal>
+            )}
         </div>
     );
 }

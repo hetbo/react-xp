@@ -1,6 +1,4 @@
 export const mockFetchStockData = async (symbol) => {
-    console.log(`Fetching data for ${symbol}...`);
-    // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, Math.random() * 800 + 200));
 
     // Simulate a potential error for a specific symbol

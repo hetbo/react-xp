@@ -5,9 +5,6 @@ import React from 'react';
 // in the parent, these functions would be new on every render, causing this
 // component to re-render unnecessarily.
 const UserItem = React.memo(function UserItem({ user, onRemove, onPromote }) {
-    // This log is our proof. It should ONLY appear when this specific user's
-    // data changes, or when the user is first created or finally removed.
-    console.log(`%c[UserItem] Re-rendering: ${user.name}`, 'color: red;');
 
     return (
         <div className="bg-gray-700 p-4 rounded-lg flex justify-between items-center">

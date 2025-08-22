@@ -95,7 +95,6 @@ export function useStockData() {
 
     // REQUIREMENT #3: Manual refresh function.
     const refreshData = () => {
-        console.log("Manual refresh triggered!");
         fetchPrices(watchlist);
     };
 
