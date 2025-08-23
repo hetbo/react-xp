@@ -3,7 +3,7 @@ import { useUsers } from './hooks/useUsers';
 import { useAuth } from '../../context/AuthContext.jsx'; // 1. Import the auth hook
 import SearchBar from './components/SearchBar.jsx';
 import UserItem from './components/UserItem.jsx';
-import Modal from "../../components/Modal.jsx";
+import Modal from "../../components/Modal.tsx";
 
 function UserDashboardPage() {
 

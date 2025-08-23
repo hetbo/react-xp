@@ -1,10 +1,11 @@
-// src/NextTodo.jsx
+// src/NextTodo.tsx
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import TodoItem from './TodoItem';
+import { Todo, Filter } from '../types/todo'; // Import shared types
 
 function NextTodo() {
-    const [todos, setTodos] = useState(() => {
+    const [todos, setTodos] = useState<Todo[]>(() => {
         const savedTodos = localStorage.getItem('todos');
         if (savedTodos) {
             return JSON.parse(savedTodos);
@@ -17,21 +18,25 @@ function NextTodo() {
         }
     });
 
-    const [newTodo, setNewTodo] = useState('');
-    const [filter, setFilter] = useState('all');
+    // Tell useState that this state will be a string
+    const [newTodo, setNewTodo] = useState<string>('');
+    // Tell useState that this state will conform to the Filter type
+    const [filter, setFilter] = useState<Filter>('all');
 
     useEffect(() => {
         localStorage.setItem('todos', JSON.stringify(todos));
     }, [todos]);
 
-    const handleAddTodo = (e) => {
+    // Type the event argument for the form handler
+    const handleAddTodo = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (newTodo.trim() === '') return;
         setTodos([...todos, { id: Date.now(), text: newTodo, completed: false }]);
         setNewTodo('');
     };
 
-    const handleToggleComplete = (id) => {
+    // Type the id argument for the toggle handler
+    const handleToggleComplete = (id: number) => {
         setTodos(
             todos.map((todo) =>
                 todo.id === id ? { ...todo, completed: !todo.completed } : todo
@@ -39,7 +44,8 @@ function NextTodo() {
         );
     };
 
-    const handleDeleteTodo = (id) => {
+    // Type the id argument for the delete handler
+    const handleDeleteTodo = (id: number) => {
         setTodos(todos.filter((todo) => todo.id !== id));
     };
 
@@ -58,7 +64,8 @@ function NextTodo() {
                     <input
                         type="text"
                         value={newTodo}
-                        onChange={(e) => setNewTodo(e.target.value)}
+                        // Type the event argument for the input handler
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewTodo(e.target.value)}
                         placeholder="Add a new task"
                         className="flex-grow bg-gray-700 text-white border-2 border-gray-600 rounded-lg p-2 focus:outline-none focus:border-cyan-500 transition-colors"
                     />
@@ -71,13 +78,12 @@ function NextTodo() {
                 </form>
 
                 <div className="flex justify-center gap-4 mb-6">
-                    {/* ▼▼▼ HIGH-CONTRAST BUTTONS (FINAL FIX) ▼▼▼ */}
                     <button
                         onClick={() => setFilter('all')}
                         className={`font-bold py-2 px-4 rounded-lg transition-colors ${
                             filter === 'all'
-                                ? 'bg-cyan-400 text-cyan-950' // Active: Light bg, very dark text
-                                : 'bg-slate-700 text-slate-300 hover:bg-slate-600' // Inactive: Dark bg, light text
+                                ? 'bg-cyan-400 text-cyan-950'
+                                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                         }`}
                     >
                         All
@@ -86,8 +92,8 @@ function NextTodo() {
                         onClick={() => setFilter('active')}
                         className={`font-bold py-2 px-4 rounded-lg transition-colors ${
                             filter === 'active'
-                                ? 'bg-cyan-400 text-cyan-950' // Active: Light bg, very dark text
-                                : 'bg-slate-700 text-slate-300 hover:bg-slate-600' // Inactive: Dark bg, light text
+                                ? 'bg-cyan-400 text-cyan-950'
+                                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                         }`}
                     >
                         Active
@@ -96,13 +102,12 @@ function NextTodo() {
                         onClick={() => setFilter('completed')}
                         className={`font-bold py-2 px-4 rounded-lg transition-colors ${
                             filter === 'completed'
-                                ? 'bg-cyan-400 text-cyan-950' // Active: Light bg, very dark text
-                                : 'bg-slate-700 text-slate-300 hover:bg-slate-600' // Inactive: Dark bg, light text
+                                ? 'bg-cyan-400 text-cyan-950'
+                                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                         }`}
                     >
                         Completed
                     </button>
-                    {/* ▲▲▲ HIGH-CONTRAST BUTTONS (FINAL FIX) ▲▲▲ */}
                 </div>
 
                 <ul>

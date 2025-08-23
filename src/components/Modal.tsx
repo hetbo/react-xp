@@ -4,7 +4,19 @@ import { useEffect } from 'react';
 // Get a reference to our portal root in the DOM
 const modalRoot = document.getElementById('modal-root');
 
-function Modal({ children, onClose }) {
+
+type ModalProps = {
+    // `children` is a special prop in React. Its type is `React.ReactNode`.
+    // This means it can be anything React can render: JSX, a string, a number, null, etc.
+    children: React.ReactNode;
+
+    // `onClose` is a function. Looking at the code, it takes no arguments
+    // and returns nothing. The type for this is `() => void`.
+    onClose: () => void;
+};
+
+
+const Modal: React.FC<ModalProps> = ({ children, onClose }) => {
     // Use an effect to add a class to the body to prevent scrolling when the modal is open
     useEffect(() => {
         document.body.classList.add('overflow-hidden');
@@ -14,6 +26,10 @@ function Modal({ children, onClose }) {
             document.body.classList.remove('overflow-hidden');
         };
     }, []);
+
+    if (!modalRoot) {
+        return null;
+    }
 
     // Use createPortal to render the modal JSX into the modalRoot element
     return createPortal(

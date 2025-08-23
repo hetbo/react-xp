@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import ErrorBoundary from '../components/ErrorBoundary';
+import ErrorBoundary from '../components/ErrorBoundary.js';
 
 // This component will throw an error if the count reaches 3.
 function CrashingCounter() {

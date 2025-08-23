@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { mockFetchStockData } from '../api/mockStockApi';
+import { mockFetchStockData } from '../api/mockStockApi.js';
 
 export function useStockData() {
     // --- STATE INITIALIZATION FROM LOCALSTORAGE ---

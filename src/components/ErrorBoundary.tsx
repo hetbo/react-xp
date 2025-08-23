@@ -1,21 +1,27 @@
-import React from 'react';
+import React, {ErrorInfo} from 'react';
 
-class ErrorBoundary extends React.Component {
-    constructor(props) {
+type ErrorBoundaryProps = {
+    children: React.ReactNode;
+};
+
+type ErrorBoundaryState = {
+    hasError: boolean;
+    // The `Error` type is a built-in JavaScript type.
+    error: Error | null;
+};
+
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+
+    constructor(props: ErrorBoundaryProps) {
         super(props);
         this.state = { hasError: false, error: null };
     }
 
-    // This lifecycle method is called when an error is thrown in a child component.
-    // It should return a new state object to trigger a re-render with the fallback UI.
-    static getDerivedStateFromError(error) {
+    static getDerivedStateFromError(error: ErrorBoundaryState) {
         return { hasError: true, error: error };
     }
 
-    // This lifecycle method is used for logging the error information.
-    componentDidCatch(error, errorInfo) {
-        // In a real application, you would log this to an error reporting service
-        // like Sentry, LogRocket, or your own logging endpoint.
+    componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         console.error("Uncaught error in ErrorBoundary:", error, errorInfo);
     }
 
@@ -26,7 +32,6 @@ class ErrorBoundary extends React.Component {
                 <div className="bg-red-900 border border-red-400 text-white p-4 rounded-lg" role="alert">
                     <h2 className="font-bold text-lg mb-2">Something went wrong.</h2>
                     <p>This part of the application has crashed. Please try refreshing the page.</p>
-                    {/* Optionally display error details during development */}
                     {process.env.NODE_ENV === 'development' && (
                         <details className="mt-4 text-sm">
                             <summary>Error Details</summary>
@@ -38,8 +43,6 @@ class ErrorBoundary extends React.Component {
                 </div>
             );
         }
-
-        // If there's no error, just render the children as normal.
         return this.props.children;
     }
 }

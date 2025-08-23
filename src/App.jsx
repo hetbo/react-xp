@@ -3,7 +3,7 @@ import {BrowserRouter, Routes, Route, NavLink, useNavigate} from 'react-router-d
 // Import Context Providers and hooks
 import {AuthProvider} from "./context/AuthProvider.jsx";
 import {useAuth} from './context/AuthContext.jsx';
-import NextTodo from './components/NextTodo.jsx'; // Ensure path is correct
+import NextTodo from './components/NextTodo.tsx'; // Ensure path is correct
 import UserDashboardPage from './features/user-dashboard/UserDashboardPage';
 import {lazy, Suspense} from "react";
 import RiskyPage from "./pages/RiskyPage.jsx";

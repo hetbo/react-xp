@@ -1,6 +1,13 @@
-// src/TodoItem.jsx
+import React from 'react';
+import { Todo } from '../types/todo';
 
-function TodoItem({ todo, onToggleComplete, onDelete }) {
+type TodoItemProps = {
+    todo: Todo;
+    onToggleComplete: (id: number) => void;
+    onDelete: (id: number) => void;
+};
+
+const TodoItem: React.FC<TodoItemProps> = ({ todo, onToggleComplete, onDelete }) => {
     return (
         <li className="flex items-center justify-between bg-gray-700 p-4 rounded-lg mb-3 transition-all duration-300 ease-in-out">
       <span
